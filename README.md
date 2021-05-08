@@ -1,1 +1,1 @@
-# glass-os
+# GlassOS
