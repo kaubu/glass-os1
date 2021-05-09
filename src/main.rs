@@ -1,5 +1,8 @@
 pub mod shell;
 pub mod glass;
+pub mod sand;
+pub mod ash;
+pub mod lime;
 
 use std::io::{self, Write};
 

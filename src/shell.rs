@@ -1,7 +1,9 @@
 use std::path::PathBuf;
-use crate::{debug, input};
 use crate::{
+	debug,
+	input,
 	glass,
+	sand,
 };
 
 const DEFAULT_SHELL: &str = "glass";
@@ -31,6 +33,7 @@ struct OsShell<'a, 'b, 'c, 'd> {
 	path: &'b mut PathBuf,
 	cursor: &'c mut String,
 	argv: &'d mut Vec<String>,
+	auth: sand::UserType,
 }
 
 impl<'a, 'b, 'c, 'd> OsShell<'a, 'b, 'c, 'd> {
@@ -45,6 +48,7 @@ impl<'a, 'b, 'c, 'd> OsShell<'a, 'b, 'c, 'd> {
 			path,
 			cursor,
 			argv,
+			auth: sand::UserType::None,
 		}
 	}
 }
@@ -86,13 +90,20 @@ fn parse_argv(os_shell: OsShell) -> OsResult {
 	let cursor = os_shell.cursor;
 	let argv = os_shell.argv;
 
+	if argv.len() >= 1 {
+		if is_shell(&argv[0]) {
+			if argv[0] != "sand" && os_shell.auth == sand::UserType::None {
+				return OsResult::Error("Not authenticated. Do 'sand login' to authenticate".to_string());
+			}
+		}
+	}
+
 	// Glass default shell
 	if shell.is_empty() {
 		match argv.len() {
 			1 if is_shell(&argv[0]) => {
 				// sand, ash, lime
-				println!("debug: &argv[0] == {}", &argv[0]);
-				println!("debug: is_shell(&argv[0]) == {}", is_shell(&argv[0]));
+
 				*shell = argv[0].clone();
 				*cursor = format!("{}: {}> ", argv[0], path_display(path));
 			},
@@ -113,6 +124,33 @@ fn parse_argv(os_shell: OsShell) -> OsResult {
 			}
 		},
 		_ => {},
+	}
+
+	if argv[0] == "sand" {
+		match argv.len() {
+			l if l >= 3 => {
+				if argv[1] == "create" {
+					// Check for authentication when SAND is implemented
+					if argv[2] == "user" {
+						
+					} else if argv[2] == "admin" {
+
+					}
+				}
+			},
+			l if l >= 2 => {
+				
+			},
+			_ => {},
+		}
+	} else if argv[0] == "ash" {
+		match argv.len() {
+			_ => {},
+		}
+	} else if argv[0] == "lime" {
+		match argv.len() {
+			_ => {},
+		}
 	}
 
 	OsResult::Success
